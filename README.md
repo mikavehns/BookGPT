@@ -32,6 +32,13 @@ You will then be prompted to enter the following information:
 The program will then generate a Title and Chapter Titles + Content. You will get a detailed structure of the book.
 The generated books will then be saved in the `books` folder and will be named after the title of the book.
 
+## Examples
+Here are some examples:
+- Generate book with 5 chapters and 300 words per chapter, with quotes as chapter title, with the topic "success"
+https://user-images.githubusercontent.com/66560242/210459589-751c82d7-e874-4119-a09a-cc36ea2be73c.mp4
+You can see the generated book in `examples/The_Path_To_Success.md`.
+
+
 ## Notes
 - The program may take some time to run, depending on the specified parameters and the performance of the GPT-3 API. Please be patient while the book is being generated.
 - The program may not always generate the wished amount of words for each chapter. This can happen, if there is not enough data available for the specified topic.
