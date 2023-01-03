@@ -39,6 +39,7 @@ The generated books will then be saved in the `books` folder and will be named a
 ## Examples
 Here are some examples:
 - Generate book with 5 chapters and 300 words per chapter, with quotes as chapter title, with the topic "success":
+
 https://user-images.githubusercontent.com/66560242/210459589-751c82d7-e874-4119-a09a-cc36ea2be73c.mp4
 
 You can see the generated book in `examples/The_Path_To_Success.md`.
