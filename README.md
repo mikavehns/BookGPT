@@ -1,4 +1,4 @@
-<h1 align="center">BookGPT</h1>
+<h1 align="center">BookGPT (Beta)</h1>
 <p align="center">This program uses the GPT-3 API to generate books based on your specified parameters.
 <br><br>
 </p>
@@ -49,6 +49,7 @@ You can see the generated book in `examples/The_Path_To_Success.md`.
 - The program may take some time to run, depending on the specified parameters and the performance of the GPT-3 API. Please be patient while the book is being generated.
 - The program may not always generate the wished amount of words for each chapter. This can happen, if there is not enough data available for the specified topic.
 - Currently, it is only possible to generate Non-Fiction books.
+- Since this is a really early version (v0.5.2), there are many missing features, that will be added by time
 
 
 ## License
