@@ -1,4 +1,4 @@
-from book import Book
+from src.book import Book
 
 
 class Save:

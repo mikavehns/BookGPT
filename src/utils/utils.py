@@ -1,4 +1,4 @@
-from book import Book
+from src.book import Book
 
 
 def convert_to_markdown(book: Book):
