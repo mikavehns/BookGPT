@@ -56,4 +56,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 ## Contributing
-If you are interested in contributing to BookGPT, I welcome any suggestions or pull requests. Please feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/mikavehns/BookGPT).
+- If you are interested in contributing to BookGPT, I welcome any suggestions or pull requests. Please feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/mikavehns/BookGPT).
+- You can also submit your books, which I will then add to the `examples` folder. Just open a pull request with the book in the `examples` folder.
