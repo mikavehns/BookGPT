@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 
 ## Prerequisites
-In order to use this program, you must have a [GPT-3 API key](https://beta.openai.com/docs/developer-quickstart).
+In order to use this program, you must have a [GPT-3 API key](https://beta.openai.com/account/api-keys).
 
 
 ## Usage
