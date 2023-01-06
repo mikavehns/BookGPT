@@ -6,6 +6,7 @@
 - Words/Chapter: 300
 - Topic: "success"
 - Version Used: 0.5.1
+- Author: @mikavehns
 
 
 ## Chapter 1: "A Vision to Pursue" - The Wisdom of Steve Jobs 

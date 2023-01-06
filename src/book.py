@@ -110,7 +110,7 @@ class Book:
         """
 
         # Define the chapter titles as the chapter titles of the book
-        chapters = self.book.get_chapters(self.title, self.chapter_amount).split('\n')
+        chapters = self.book.get_chapters(self.title).split('\n')
 
         # Remove the blank lines
         chapters = [chapter for chapter in chapters if chapter != '']
@@ -124,7 +124,7 @@ class Book:
         """
 
         # Get the structure of the book and splitting it by the new lines
-        structure = self.book.get_structure(self.title, self.chapter_titles, self.words_per_chapter).split('\n')
+        structure = self.book.get_structure(self.title, self.chapter_titles).split('\n')
 
         # Remove the blank lines
         structure = [chapter for chapter in structure if chapter != '']

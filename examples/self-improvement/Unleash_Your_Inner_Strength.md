@@ -6,6 +6,7 @@
 - Words/Chapter: 500
 - Topic: "success"
 - Version Used: 0.6.0
+- Author: @mikavehns
 
 ## 1. Taking Control of Your Thoughts: A Step-by-Step Guide for Reclaiming Your Power
 

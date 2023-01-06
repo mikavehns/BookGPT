@@ -70,10 +70,6 @@ def main():
     print('How many words should each chapter have?')
     words = int(input('> '))
 
-    # Get the topic of the book
-    print('What is the topic of the book?')
-    topic = input('> ')
-
     # Get the category of the book
     print('What is the category of the book?')
 
@@ -82,6 +78,10 @@ def main():
 
     # Get the category
     category = categories[get_option(categories) - 1]
+
+    # Get the topic of the book
+    print('What is the topic of the book?')
+    topic = input('> ')
 
     # Print the book parameters
     print(f'Generating a book with {chapters} chapters, {words} words per chapter, topic "{topic}" and category "{category}".')

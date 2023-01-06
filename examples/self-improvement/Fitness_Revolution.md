@@ -5,8 +5,9 @@
 - Runtime: 6.03 min
 - Chapters: 10
 - Words/Chapter: 750
-- Topic: "fitness'
+- Topic: "fitness"
 - Version Used: 0.6.0
+- Author: @mikavehns
 
 ## 1. Get Motivated: Understanding Your Goals and Taking the First Steps
 

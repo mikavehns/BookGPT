@@ -6,6 +6,7 @@
 - Words/Chapter: 1,250
 - Topic: "sleep"
 - Version Used: 0.6.0
+- Author: @mikavehns
 
 ## 1. "Unlocking the Power of Sleep: Learn to Prioritize Rest for Maximum Performance" 
 
