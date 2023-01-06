@@ -42,7 +42,7 @@ Here are some examples:
 
 https://user-images.githubusercontent.com/66560242/210459589-751c82d7-e874-4119-a09a-cc36ea2be73c.mp4
 
-You can see the generated book in `examples/The_Path_To_Success.md`.
+- You can see all examples in the `examples/` directory.
 
 
 ## Notes
