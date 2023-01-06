@@ -1,1 +1,1 @@
-from .nonfiction import NonFiction
+from .selfhelp import SelfHelp as selfhelp

@@ -3,8 +3,9 @@
 ## Information
 - Runtime: 10.54 min
 - Chapters: 5
-- Word/Chapter: 300
-- Type: Quote
+- Words/Chapter: 300
+- Topic: "success"
+- Version Used: 0.5.1
 
 
 ## Chapter 1: "A Vision to Pursue" - The Wisdom of Steve Jobs 

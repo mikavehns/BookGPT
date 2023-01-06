@@ -1,9 +1,6 @@
-from categories.nonfiction import NonFiction
 import openai
-from openai.error import InvalidRequestError as ire, APIConnectionError as ace
-import retrying
-import re
 import os
+from categories import *
 
 
 class Book:
@@ -18,69 +15,49 @@ class Book:
         title: The title of the book.
         chapter_titles: The titles of the chapters.
         structure: The structure of the book.
-        content: The content of the book.
     """
 
-    def __init__(self, chapter_amount: int, words_per_chapter: int, type: str, topic: str, category: str):
+    def __init__(self, chapter_amount: int, words_per_chapter: int, topic: str, category: str):
         """
         This is the constructor for the Book class. It initializes the object with the given parameters.
         :param chapter_amount: The number of chapters in the book (int).
         :param words_per_chapter: The number of words per chapter (int).
-        :param type: The type of book (fiction, non-fiction, etc) (str).
         :param topic: The topic of the book (str).
         :param category: The category of the book (fiction, non-fiction, etc) (str).
         """
 
-        # Define the amount of chapters
+        # Define chapter amount
         self.chapter_amount = chapter_amount
 
-        # Define the amount of words per chapter
+        # Define words per chapter
         self.words_per_chapter = words_per_chapter
 
-        # Define the category of the book
-        self.category = category
-
-        # Define the topic of the book
+        # Define topic
         self.topic = topic
 
-        # Check what category of book it is
-        if category == 'non-fiction':
+        # Define category
+        self.category = category
 
-            # If it is non-fiction, create a non-fiction book
-            content = NonFiction(chapter_amount, words_per_chapter, type, topic, category)
+        # Get book using `get_category` method
+        self.book = self.get_category()
 
-        else:
+        # Set the title of the book
+        self.title = self.get_title()
 
-            # If the book category is not supported, raise an error
-            raise ValueError('This book type is not supported yet.')
+        # Set the chapter titles
+        self.chapter_titles = self.get_chapter_titles()
 
-        # Define the title of the book
-        self.title = content.title
-
-        # Define the chapter titles
-        self.chapter_titles = content.chapter_titles
-
-        # Define the structure of the book
-        self.structure = content.structure
-
-        # Define the content of the book
-        self.content = content.content
+        # Set the structure of the book
+        self.structure = self.get_structure()
 
     def __str__(self):
         """
-        This method returns a string representation of the book object.
+        This method returns the book as a string.
+        :return: The book as a string.
         """
 
-        # Remove all expressions that begin with "Paragraph" and return the book as a string
-        return re.sub(r"Paragraph \d+: ", "", self.combine_chapters())
-
-    def get_structure(self):
-        """
-        This method returns a dictionary containing the title, chapters, and structure of the book.
-        """
-
-        # Create a dictionary to store the structure
-        return {'Title': self.title, 'Chapters': dict(zip(self.chapter_titles, self.structure))}
+        # Return the combined chapters
+        return self.combine()
 
     @staticmethod
     def __get_edit(input_text, instruction, temperature: float = 0):
@@ -99,54 +76,203 @@ class Book:
             instruction=instruction,
             temperature=temperature).choices[0].text
 
-    def combine_chapters(self):
+    def get_category(self):
+
+        # Get all the files in the directory 'categories'
+        categories = os.listdir('categories')
+
+        # Remove the files that start with '__'
+        categories = [category for category in categories if not category.startswith('__')]
+
+        # Check if the category is in the directory
+        if self.category + '.py' not in categories:
+
+            # Raise an error
+            raise ValueError(f'Category {self.category} not found.')
+
+        # Return the category class
+        return globals()[self.category](self.chapter_amount, self.words_per_chapter, self.topic)
+
+    def get_title(self):
         """
-        This method combines all the chapters of the book into one string.
-        :return: The book as a single string.
+        This method returns the title of the book.
         """
 
-        # Define the book variable as the title with three empty lines below it
-        book = self.title + (3*"\n")
+        # Get the title of the book and delete the blank lines
+        title = self.book.get_title().replace('\n', '')
 
-        # Loop through all the chapters
-        for chapter in range(0, self.chapter_amount):
+        # Return the title
+        return title
 
-            # Add the chapter title and the content of the chapter to the book
-            book += self.chapter_titles[chapter] + "\n"
-            book += self.content[chapter] + "\n"
+    def get_chapter_titles(self):
+        """
+        This method returns the chapter titles of the book.
+        """
 
-        # Return the book
+        # Define the chapter titles as the chapter titles of the book
+        chapters = self.book.get_chapters(self.title, self.chapter_amount).split('\n')
+
+        # Remove the blank lines
+        chapters = [chapter for chapter in chapters if chapter != '']
+
+        # Return the chapter titles
+        return chapters
+
+    def get_structure(self):
+        """
+        This method returns the structure of the book.
+        """
+
+        # Get the structure of the book and splitting it by the new lines
+        structure = self.book.get_structure(self.title, self.chapter_titles, self.words_per_chapter).split('\n')
+
+        # Remove the blank lines
+        structure = [chapter for chapter in structure if chapter != '']
+
+        # Create a list of chapters
+        chapter_list = []
+
+        # Create a list of paragraphs
+        chapter = []
+
+        # Iterate over the lines
+        for line in structure:
+
+            # If the line starts with 'Chapter'
+            if line.lower().startswith('chapter'):
+                # Add the chapter to the list of chapters
+                chapter_list.append(chapter)
+
+                # Create a new list of paragraphs
+                chapter = []
+
+            # Add the line to the list of paragraphs
+            chapter.append(line)
+
+        # Add the last chapter to the list of chapters
+        chapter_list.append(chapter)
+
+        # Remove the first chapter
+        chapter_list = chapter_list[1:]
+
+        # Remove the first paragraph of each chapter
+        chapter_list = [chapter[1:] for chapter in chapter_list]
+
+        # Create a new list of chapters
+        chapter_list_new = []
+
+        # Iterate over the chapters
+        for chapter in chapter_list:
+
+            # Create a list of paragraphs
+            paragraph_list = []
+
+            # Iterate over the paragraphs
+            for paragraph in chapter:
+
+                # Get the title of the paragraph
+                title = paragraph.split('---')[0]
+
+                # Get the word count of the paragraph
+                word_count = paragraph.split('---')[1]
+
+                # If the word count contains the word 'words'
+                if 'words' in word_count.lower():
+                    # Remove the word 'words'
+                    word_count = word_count.split(' ')[0]
+
+                # Add the paragraph to the list of paragraphs
+                paragraph_list.append({'title': title, 'word_count': word_count})
+
+            # Add the list of paragraphs to the list of chapters
+            chapter_list_new.append(paragraph_list)
+
+        # Return the list of chapters
+        return chapter_list_new
+
+    def get_paragraph(self, chapter_index, paragraph_index):
+        """
+        This method returns the paragraph at the given index in the given chapter.
+        :param paragraph_index: The index of the paragraph.
+        :param chapter_index: The index of the chapter.
+        :return: The paragraph.
+        """
+
+        # Get the paragraph at the given index in the given chapter
+        return self.book.get_paragraph(self.title, self.chapter_titles, self.structure, paragraph_index, chapter_index)
+
+    def get_chapter(self, chapter_index):
+        """
+        This method returns the chapter at the given index.
+        :param chapter_index: The index of the chapter.
+        :return: The chapter.
+        """
+
+        # Define empty list for the paragraphs
+        chapter = []
+
+        # Iterate over the paragraphs in the chapter
+        for i in range(len(self.structure[chapter_index])):
+
+            # Add the paragraph to the list of paragraphs
+            chapter.append(self.get_paragraph(chapter_index, i))
+
+        # Return the chapter
+        return chapter
+
+    def get_content(self):
+        """
+        This method returns the book.
+        :return: The book.
+        """
+
+        # Define empty list for the content of the chapters
+        content = []
+
+        # Iterate over the chapters
+        for i in range(len(self.structure)):
+
+            # Add the content of the chapter to the list
+            content.append(self.get_chapter(i))
+
+        # Return the content
+        return content
+
+    def combine(self):
+        """
+        This method combines the title, chapter titles, and structure of the book.
+        :return: The combined book.
+        """
+
+        # Get the content of the book
+        content = self.get_content()
+
+        # Add the title of the book
+        book = '# ' + self.title + '\n\n\n'
+
+        # Add the chapter titles and content
+        for i in range(len(content)):
+
+            # Add the chapter title in md format
+            book += '\n\n## ' + self.chapter_titles[i] + '\n'
+
+            # Iterate through the paragraphs
+            for paragraph in content[i]:
+
+                # Check if paragraph ends with a blank line
+                if paragraph.endswith('\n'):
+
+                    # Add the paragraph
+                    book += paragraph
+                else:
+
+                    # Add the paragraph with a blank line
+                    book += paragraph + '\n'
+
+        # Return the combined book.
         return book
 
-    @retrying.retry(stop_max_attempt_number=2, wait_fixed=1000, retry_on_exception=lambda e: isinstance(e, ire) or isinstance(e, ace))
-    def correct_chapter(self, input_text):
-        """
-        This method corrects the grammar and punctuation of a given chapter.
-        :param input_text: The text of the chapter to be corrected.
-        :return: The corrected text of the chapter.
-        """
-
-        # Define the instruction for the edit and return the edited version
-        return self.__get_edit(input_text, "Remove all Titles. Correct Grammar mistakes. Correct punctuation mistakes. Remove \"Paragraph\" and other expression in front of the paragraphs.", temperature=0.7)
-
-    def correct(self):
-        """
-        This method corrects the grammar and punctuation of all chapters in the book.
-        """
-
-        # Loop through all the chapters
-        for chapter in range(0, self.chapter_amount):
-
-            try:
-
-                # Correct the grammar and punctuation of the chapter
-                self.content[chapter] = self.correct_chapter(self.content[chapter])
-
-            except ire or ace:
-
-                print(f'Could not correct chapter {chapter + 1}.')
-
-    def save_txt(self):
+    def save_md(self):
         """
         This method saves the book as a text file.
         """
@@ -162,15 +288,17 @@ class Book:
 
         # Checking the file name has a colon
         if ':' in file_name:
-
             # If it does, split the file name at the colon and set the file name as the first part
             file_name = file_name.split(':')[0]
 
         # Define the file path as the file name plus the directory to save the book in
-        path = 'books/' + file_name + '.txt'
+        path = 'books/' + file_name + '.md'
 
         # Open the file
         with open(path, 'w') as f:
 
             # Write the book to the file
             f.write(str(self))
+
+        # Print the file path
+        print(f'Book saved as {path}.')

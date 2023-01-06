@@ -1,10 +1,10 @@
 # Imports
-import pandas as pd
 from pyfiglet import Figlet
 from book import Book
-from utils.utils import draw_data_structure
+from utils import draw_data_structure
 import json
 import openai
+import os
 
 
 # Get the OpenAI API key from the config file
@@ -50,18 +50,6 @@ def get_option(options):
             print('Invalid option. Please try again.')
 
 
-# Get the type of the book
-def get_type():
-    # Load the types list
-    types = pd.read_csv('types.csv')
-
-    # Get the type of the book
-    selection = get_option(types['name'].values)
-
-    # Return the type
-    return types.iloc[selection - 1, 1::].values
-
-
 # Main function
 def main():
     # Set the OpenAI API key
@@ -82,51 +70,42 @@ def main():
     print('How many words should each chapter have?')
     words = int(input('> '))
 
-    # Get the type of the book
-    book_type, type = get_type()
-
     # Get the topic of the book
     print('What is the topic of the book?')
     topic = input('> ')
 
+    # Get the category of the book
+    print('What is the category of the book?')
+
+    # Get all files in categories folder
+    categories = [file[:-3] for file in os.listdir('categories') if not file.startswith('__') and file.endswith('.py')]
+
+    # Get the category
+    category = categories[get_option(categories) - 1]
+
     # Print the book parameters
-    print(f'Generating a {book_type} book about {topic} with {chapters} chapters and {words} words per chapter...')
+    print(f'Generating a book with {chapters} chapters, {words} words per chapter, topic "{topic}" and category "{category}".')
 
     # Create a new book
-    book = Book(chapters, words, type, topic, book_type)
+    book = Book(chapters, words, topic, category)
 
-    # Print that the book is done
-    print('Book generated.\nShow structure')
+    # Print title
+    print(f'Title: {book.title}')
 
-    # Check if the user wants to show the structure
-    if not get_option(['Yes', 'No']) - 1:
-        # Draw the book structure
-        draw_data_structure(book.get_structure())
+    # Print chapter titles
+    print('Chapter titles:')
+    for i, title in enumerate(book.chapter_titles):
+        print(f'[{i + 1}] {title}')
 
-    # Check if the user wants to run the correction
-    print('Correct book')
-    if not get_option(['Yes', 'No']) - 1:
+    # Print the structure
+    print('\nStructure:')
+    print(book.structure)
 
-        # Print that the book is being checked
-        print('Checking for errors...')
+    # Print Information
+    print('\nGenerating content...')
 
-        # Correct the book
-        book.correct()
-    else:
-
-        # Print that the correction is skipped
-        print('Skipping correction...')
-
-    # Check if the user wants to save the book
-    print('Save book')
-    if not get_option(['Yes', 'No']) - 1:
-
-        # Save the book
-        book.save_txt()
-    else:
-
-        # Print that the book is not saved
-        print('Skipping save.')
+    # Generate the book
+    book.save_md()
 
     # Print that the process is done
     print('Done.')
