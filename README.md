@@ -30,7 +30,7 @@ You will then be prompted to enter the following information:
 - Chapter Amount: The amount of chapters you want the book to have.
 - Chapter Length: The amount of words you want each chapter to have.
 - Topic: The topic you want the book to be about.
-- Type: The type of book you want to generate. (Science, Biography, etc.)
+- Category: The type of book you want to generate. (Science, Biography, etc.)
 
 The program will then generate a Title and Chapter Titles + Content. You will get a detailed structure of the book.
 The generated books will then be saved in the `books` folder and will be named after the title of the book.
@@ -49,7 +49,7 @@ You can see the generated book in `examples/The_Path_To_Success.md`.
 - The program may take some time to run, depending on the specified parameters and the performance of the GPT-3 API. Please be patient while the book is being generated.
 - The program may not always generate the wished amount of words for each chapter. This can happen, if there is not enough data available for the specified topic.
 - Currently, it is only possible to generate Non-Fiction books.
-- Since this is a really early version (v0.5.2), there are many missing features, that will be added by time
+- Since this is a really early version (v0.6.0), there are many missing features, that will be added by time
 
 
 ## License
