@@ -78,17 +78,8 @@ class Book:
 
     def get_category(self):
 
-        # Get all the files in the directory 'categories'
-        categories = os.listdir('categories')
-
-        # Remove the files that start with '__'
-        categories = [category for category in categories if not category.startswith('__')]
-
-        # Check if the category is in the directory
-        if self.category + '.py' not in categories:
-
-            # Raise an error
-            raise ValueError(f'Category {self.category} not found.')
+        # Get the category
+        self.category = self.category
 
         # Return the category class
         return globals()[self.category](self.chapter_amount, self.words_per_chapter, self.topic)

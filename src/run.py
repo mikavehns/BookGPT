@@ -1,7 +1,7 @@
 # Imports
 from pyfiglet import Figlet
 from book import Book
-from utils import draw_data_structure
+from utils import *
 import json
 import openai
 import os
@@ -74,7 +74,7 @@ def main():
     print('What is the category of the book?')
 
     # Get all files in categories folder
-    categories = [file[:-3] for file in os.listdir('categories') if not file.startswith('__') and file.endswith('.py')]
+    categories = get_categories()
 
     # Get the category
     category = categories[get_option(categories) - 1]

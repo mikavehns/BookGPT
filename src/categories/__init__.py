@@ -1,5 +1,5 @@
-from .selfimprovement import SelfImprovement as selfimprovement
-from .biography import Biography as biography
-from .science import Science as science
-from .history import History as history
-from .travel import Travel as travel
+from .selfimprovement import SelfImprovement
+from .biography import Biography
+from .science import Science
+from .history import History
+from .travel import Travel
