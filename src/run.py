@@ -1,9 +1,9 @@
 # Imports
 from pyfiglet import Figlet
 from book import Book
-from utils import *
 import json
 import openai
+from utils import *
 
 
 # Get the OpenAI API key from the config file
@@ -98,20 +98,15 @@ def main():
     book.generate()
 
     # Print the saving instruction
-    saving_option = get_option(['Markdown', 'PDF', 'HTML'])
+    saving_option = get_option(['Markdown', 'HTML'])
     if saving_option == 1:
         print('Saving to markdown...')
-        with open('../examples/science/Living_Beyond_Earth.md', 'w') as f:
+        with open('book.md', 'w') as f:
             f.write(book.get_md())
 
     elif saving_option == 2:
-        print('Saving to PDF...')
-        with open('book.pdf', 'wb') as f:
-            f.write(book.get_pdf())
-
-    elif saving_option == 3:
         print('Saving to HTML...')
-        with open('book.html', 'w') as f:
+        with open('../src/book.html', 'w') as f:
             f.write(book.get_html())
 
     print('Done.')
