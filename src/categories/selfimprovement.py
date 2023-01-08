@@ -7,7 +7,7 @@ class SelfImprovement:
     This class is used to generate a self-improvement book.
     """
 
-    def __init__(self, chapter_amount: int, words_per_chapter: int, topic: str):
+    def __init__(self, chapter_amount: int, words_per_chapter: int, topic: str, language: str):
         """
         Initialize the class.
         :param chapter_amount: The amount of chapters in the book.
@@ -18,6 +18,7 @@ class SelfImprovement:
         self.chapter_amount = chapter_amount
         self.words_per_chapter = words_per_chapter
         self.topic = topic
+        self.language = language
 
     @staticmethod
     @retrying.retry(stop_max_attempt_number=5, wait_fixed=1000, retry_on_exception=lambda e: isinstance(e, openai.error.ServiceUnavailableError or openai.error.RateLimitError))
@@ -45,7 +46,7 @@ class SelfImprovement:
         """
 
         return self.get_response(
-            f"Generate a title for a self-improvement book on {self.topic}. "
+            f"Generate a title for a self-improvement book on {self.topic} in {self.language}. "
             f"The title should be catchy and memorable, and should accurately reflect the content and purpose of the book. "
             f"The book will contain practical advice, exercises, and case studies to help readers achieve their goals and improve their lives. "
             f"The title should be motivating and empowering, and should encourage readers to take action.")
@@ -58,7 +59,7 @@ class SelfImprovement:
         """
 
         return self.get_response(
-            f"Generate a list of the size {self.chapter_amount} of chapter titles for a self-improvement book called {title}. "
+            f"Generate a list of the size {self.chapter_amount} of chapter titles for a self-improvement book called {title} in {self.language}. "
             f"Each chapter should cover a specific topic and should be structured as a series of "
             f"lessons or steps that the reader can follow to achieve a specific goal. "
             f"The chapter titles should be descriptive and should clearly convey the main focus of each chapter. "
@@ -73,7 +74,7 @@ class SelfImprovement:
         """
 
         return self.get_response(
-            f"Generate a structure plan for a self-improvement book called {title}. "
+            f"Generate a structure plan for a self-improvement book called {title} in {self.language}. "
             f"The book should contain {self.chapter_amount} chapters, with the following titles: {','.join(chapters)} "
             f"Each chapter should be structured as a series of lessons or steps that the reader can follow to achieve a specific goal. "
             f"The chapters should include practical tips, exercises, and case studies to help the reader apply the concepts. "
@@ -100,7 +101,7 @@ class SelfImprovement:
         titles = '\n'.join([paragraph["title"] + ' - ' + paragraph["word_count"] for paragraph in paragraphs])
         paragraph = paragraphs[paragraph_index]
         return self.get_response(
-            f"Generate the content for Chapter {chapter_index + 1} of a self-improvement book called {title}. "
+            f"Generate the content for Chapter {chapter_index + 1} in {self.language} of a self-improvement book called {title}. "
             f"The chapter is called {chapters[chapter_index]}, "
             f"and should be structured as a series of lessons or steps that the reader can follow to achieve a specific goal. "
             f"It should include practical tips, exercises, and case studies to help the reader apply the concepts. "
