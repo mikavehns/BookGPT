@@ -1,4 +1,5 @@
 import openai
+import retrying
 
 
 class Biography:
@@ -19,6 +20,7 @@ class Biography:
         self.topic = topic
 
     @staticmethod
+    @retrying.retry(stop_max_attempt_number=5, wait_fixed=1000, retry_on_exception=lambda e: isinstance(e, openai.error.ServiceUnavailableError))
     def get_response(prompt: str):
         """
         Gets a response from the API.

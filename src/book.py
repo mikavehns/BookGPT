@@ -53,6 +53,8 @@ class Book:
         # Set the structure of the book
         self.structure = self.get_structure()
 
+        self.packed = None
+
     @staticmethod
     def __get_edit(input_text, instruction, temperature: float = 0):
         """
@@ -251,10 +253,7 @@ class Book:
         book = self.packed
 
         # Define the variables
-        title = book['title']
         content = book['chapters']
-        chapter_titles = book['chapter_titles']
-        structure = book['structure']
 
         # Build the book
 
