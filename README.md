@@ -10,7 +10,7 @@ To install this program, simply follow these steps:
 ```bash
 git clone https://github.com/mikavehns/BookGPT.git
 ```
-2. Navigate to the root directory of the repository using `cd book-generator`
+2. Navigate to the root directory of the repository using `cd BookGPT/src`
 3. Install the required dependencies by running the following command:
 ```bash
 pip install -r requirements.txt
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 
 ## Prerequisites
-In order to use this program, you must have a [GPT-3 API key](https://beta.openai.com/account/api-keys).
+In order to use this program, you must have a [GPT-3 API key](https://beta.openai.com/account/api-keys). The API Key must then be inserted into the `config.json` file.
 
 
 ## Usage
@@ -46,6 +46,7 @@ https://user-images.githubusercontent.com/66560242/210459589-751c82d7-e874-4119-
 
 
 ## Notes
+- The run.py file is just one example on how to use the book generator. You can also implement it into a website, discord bot, desktop app, etc.
 - The program may take some time to run, depending on the specified parameters and the performance of the GPT-3 API. Please be patient while the book is being generated.
 - The program may not always generate the wished amount of words for each chapter. This can happen, if there is not enough data available for the specified topic.
 - Currently, it is only possible to generate Non-Fiction books.
