@@ -91,6 +91,12 @@ def main():
     # Print title
     print(f'Title: {book.title}')
 
+    # Print information
+    print('Generate book..')
+
+    # Generate the book
+    book.generate()
+
     # Print the saving instruction
     saving_option = get_option(['Markdown', 'PDF', 'HTML'])
     if saving_option == 1:
