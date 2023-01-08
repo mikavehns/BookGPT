@@ -91,22 +91,23 @@ def main():
     # Print title
     print(f'Title: {book.title}')
 
-    # Print chapter titles
-    print('Chapter titles:')
-    for i, title in enumerate(book.chapter_titles):
-        print(f'[{i + 1}] {title}')
+    # Print the saving instruction
+    saving_option = get_option(['Markdown', 'PDF', 'HTML'])
+    if saving_option == 1:
+        print('Saving to markdown...')
+        with open('../examples/science/Living_Beyond_Earth.md', 'w') as f:
+            f.write(book.get_md())
 
-    # Print the structure
-    print('\nStructure:')
-    print(book.structure)
+    elif saving_option == 2:
+        print('Saving to PDF...')
+        with open('book.pdf', 'wb') as f:
+            f.write(book.get_pdf())
 
-    # Print Information
-    print('\nGenerating content...')
+    elif saving_option == 3:
+        print('Saving to HTML...')
+        with open('book.html', 'w') as f:
+            f.write(book.get_html())
 
-    # Generate the book
-    book.save_md()
-
-    # Print that the process is done
     print('Done.')
 
 
