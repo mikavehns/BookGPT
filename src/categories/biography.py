@@ -7,7 +7,7 @@ class Biography:
     This class is used to generate a self-help book.
     """
 
-    def __init__(self, chapter_amount: int, words_per_chapter: int, topic: str):
+    def __init__(self, chapter_amount: int, words_per_chapter: int, topic: str, language: str):
         """
         Initialize the class.
         :param chapter_amount: The amount of chapters in the book.
@@ -18,6 +18,7 @@ class Biography:
         self.chapter_amount = chapter_amount
         self.words_per_chapter = words_per_chapter
         self.topic = topic
+        self.language = language
 
     @staticmethod
     @retrying.retry(stop_max_attempt_number=5, wait_fixed=1000, retry_on_exception=lambda e: isinstance(e, openai.error.ServiceUnavailableError or openai.error.RateLimitError))
@@ -45,7 +46,7 @@ class Biography:
         """
 
         return self.get_response(
-            f"Generate a title for a biography book on {self.topic}. "
+            f"Generate a title for a biography book on {self.topic} in {self.language}. "
             f"The title should be compelling and memorable, and should accurately reflect the content and purpose of the book. "
             f"The book will contain the life story and accomplishments of the person being featured. "
             f"The title should be inspiring and informative, and should encourage readers to learn about the subject's life and contributions.")
@@ -62,7 +63,7 @@ class Biography:
             f"Each chapter should cover a specific period in the subject's life and should be structured as a series of "
             f"lessons or steps that the reader can follow to understand the events and experiences that shaped the subject's life. "
             f"The chapter titles should be descriptive and should clearly convey the main focus of each chapter. "
-            f"The chapters should be engaging and informative, and should encourage the reader to learn about the subject's life and accomplishments.")
+            f"The chapters should be engaging and informative, and should encourage the reader to learn about the subject's life and accomplishments and should be written in {self.language}.")
 
     def get_structure(self, title: str, chapters: list[str]):
         """
@@ -73,16 +74,16 @@ class Biography:
         """
 
         return self.get_response(
-            f"Generate a structure plan for a biography book called {title}. "
+            f"Generate a structure plan for a biography book called {title} in {self.language}. "
             f"The book should contain {self.chapter_amount} chapters, with the following titles: {','.join(chapters)} "
             f"Each chapter should be structured as a chronology of the subject's life, including significant events, achievements, and challenges. "
             f"The chapters should include quotes, photographs, and personal anecdotes to help the reader understand and relate to the subject. "
             f"The book should be inspiring and engaging, and should offer insight into the subject's character and legacy. "
-            f"\n\nFor each chapter, create a list of subheading titles and corresponding recommended word counts in the following format: "
-            f"'subheading_title---word_amount.' The subheading titles should not include the word 'subheading' or a number. "
-            f"The total recommended word count for all subheadings in each chapter should add up to {self.words_per_chapter} words. "
-            f"In order to prevent any individual subheading from being too long, "
-            f"try to divide the content into multiple subheadings, each with a recommended word count.")
+            f"\n\nFor each chapter, create a list of paragraph titles and corresponding recommended word counts in the following format: "
+            f"'paragraph_title---word_amount.' The paragraph titles should not include the word 'paragraph' or a number. "
+            f"The total recommended word count for all paragraphs in each chapter should add up to {self.words_per_chapter} words. "
+            f"In order to prevent any individual paragraph from being too long, "
+            f"try to divide the content into multiple paragraphs, each with a recommended word count.")
 
     def get_paragraph(self, title: str, chapters: list[str], paragraphs: list[list[dict[str, str]]],
                       paragraph_index: int, chapter_index: int):
@@ -100,7 +101,7 @@ class Biography:
         titles = '\n'.join([paragraph["title"] + ' - ' + paragraph["word_count"] for paragraph in paragraphs])
         paragraph = paragraphs[paragraph_index]
         return self.get_response(
-            f"Write the content for Chapter {chapter_index + 1} of a biography called {title}. The chapter is called {chapters[chapter_index]}, "
+            f"Write the content for Chapter {chapter_index + 1} in {self.language} of a biography called {title}. The chapter is called {chapters[chapter_index]}, "
             f"and should focus on discussing a significant period in the subject's life, including their experiences, achievements, and challenges. "
             f"The chapter should include a clear explanation of the historical context and background, as well as supporting evidence and examples to illustrate the subject's life and accomplishments. "
             f"The chapter should also provide analysis and interpretation of the events and trends discussed, and may include primary sources for readers to examine. "

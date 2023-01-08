@@ -17,7 +17,7 @@ class Book:
         structure: The structure of the book.
     """
 
-    def __init__(self, chapter_amount: int, words_per_chapter: int, topic: str, category: str):
+    def __init__(self, chapter_amount: int, words_per_chapter: int, topic: str, category: str, language: str):
         """
         This is the constructor for the Book class. It initializes the object with the given parameters.
         :param chapter_amount: The number of chapters in the book (int).
@@ -38,6 +38,9 @@ class Book:
         # Define category
         self.category = category
 
+        # Define language
+        self.language = language
+
         print('Initializing..')
 
         # Get book using `get_category` method
@@ -52,6 +55,7 @@ class Book:
         # Set the structure of the book
         self.structure = self.get_structure()
 
+        # Define variable for the packed book
         self.packed = None
 
     @staticmethod
@@ -77,7 +81,7 @@ class Book:
         self.category = self.category
 
         # Return the category class
-        return globals()[self.category](self.chapter_amount, self.words_per_chapter, self.topic)
+        return globals()[self.category](self.chapter_amount, self.words_per_chapter, self.topic, self.language)
 
     def get_title(self):
         """

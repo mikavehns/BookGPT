@@ -82,11 +82,15 @@ def main():
     print('What is the topic of the book?')
     topic = input('> ')
 
+    # Get the topic of the book
+    print('What is the language of the book?')
+    language = input('> ')
+
     # Print the book parameters
-    print(f'Generating a book with {chapters} chapters, {words} words per chapter, topic "{topic}" and category "{category}".')
+    print(f'Generating a book with {chapters} chapters, {words} words per chapter, topic "{topic}" and category "{category}" in {language}.')
 
     # Create a new book
-    book = Book(chapters, words, topic, category)
+    book = Book(chapters, words, topic, category, language)
 
     # Print title
     print(f'Title: {book.title}')
@@ -101,12 +105,12 @@ def main():
     saving_option = get_option(['Markdown', 'HTML'])
     if saving_option == 1:
         print('Saving to markdown...')
-        with open('book.md', 'w') as f:
+        with open('book.md', 'w', encoding='utf-8') as f:
             f.write(book.get_md())
 
     elif saving_option == 2:
         print('Saving to HTML...')
-        with open('../src/book.html', 'w') as f:
+        with open('book.html', 'w', encoding='utf-8') as f:
             f.write(book.get_html())
 
     print('Done.')
