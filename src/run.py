@@ -4,7 +4,6 @@ from book import Book
 from utils import *
 import json
 import openai
-import os
 
 
 # Get the OpenAI API key from the config file

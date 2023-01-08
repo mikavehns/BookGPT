@@ -49,7 +49,7 @@ https://user-images.githubusercontent.com/66560242/210459589-751c82d7-e874-4119-
 - The program may take some time to run, depending on the specified parameters and the performance of the GPT-3 API. Please be patient while the book is being generated.
 - The program may not always generate the wished amount of words for each chapter. This can happen, if there is not enough data available for the specified topic.
 - Currently, it is only possible to generate Non-Fiction books.
-- Since this is a really early version (v0.6.0), there are many missing features, that will be added by time
+- Since this is a really early version (v0.6.2), there are many missing features, that will be added by time
 
 
 ## License

@@ -1,5 +1,6 @@
 import openai
-import os
+import markdown
+import pdfkit
 from categories import *
 
 
@@ -38,6 +39,8 @@ class Book:
         # Define category
         self.category = category
 
+        print('Initializing..')
+
         # Get book using `get_category` method
         self.book = self.get_category()
 
@@ -49,15 +52,6 @@ class Book:
 
         # Set the structure of the book
         self.structure = self.get_structure()
-
-    def __str__(self):
-        """
-        This method returns the book as a string.
-        :return: The book as a string.
-        """
-
-        # Return the combined chapters
-        return self.combine()
 
     @staticmethod
     def __get_edit(input_text, instruction, temperature: float = 0):
@@ -229,14 +223,40 @@ class Book:
         # Return the content
         return content
 
-    def combine(self):
+    def generate(self):
         """
-        This method combines the title, chapter titles, and structure of the book.
-        :return: The combined book.
+        This method generates the book.
         """
 
-        # Get the content of the book
+        # Get content
         content = self.get_content()
+
+        # Pack book
+        book = {'title': self.title, 'chapters': content, 'chapter_titles': self.chapter_titles, 'structure': self.structure}
+
+        # Return the book
+        self.packed = book
+
+    def get_md(self):
+        """
+        This method returns the book in Markdown format.
+        """
+
+        # Check if variable packed is exists
+        if self.packed is None:
+            print('Book not generated yet. Generating book...')
+            self.generate()
+
+        # Get the book
+        book = self.packed
+
+        # Define the variables
+        title = book['title']
+        content = book['chapters']
+        chapter_titles = book['chapter_titles']
+        structure = book['structure']
+
+        # Build the book
 
         # Add the title of the book
         book = '# ' + self.title + '\n\n\n'
@@ -263,33 +283,24 @@ class Book:
         # Return the combined book.
         return book
 
-    def save_md(self):
+    def get_html(self):
         """
-        This method saves the book as a text file.
+        This method returns the book in HTML format.
         """
 
-        # Check if the directory to save the book in exists
-        if not os.path.exists('books'):
+        # Getting Markdown element
+        md = markdown.markdown(self.get_md())
 
-            # If it does not exist, create the directory
-            os.mkdir('books')
+        # Return the HTML
+        return md
 
-        # Define the variable for the file name as the title of the book with all spaces replaced by underscores
-        file_name = (self.title + '.txt').replace(' ', '_').replace('"', '').replace('?', '')
+    def get_pdf(self):
+        """
+        This method returns the book in PDF format.
+        """
 
-        # Checking the file name has a colon
-        if ':' in file_name:
-            # If it does, split the file name at the colon and set the file name as the first part
-            file_name = file_name.split(':')[0]
+        # Get the HTML
+        html = self.get_html()
 
-        # Define the file path as the file name plus the directory to save the book in
-        path = 'books/' + file_name + '.md'
-
-        # Open the file
-        with open(path, 'w') as f:
-
-            # Write the book to the file
-            f.write(str(self))
-
-        # Print the file path
-        print(f'Book saved as {path}.')
+        # Return the PDF
+        return pdfkit.from_string(html, False)

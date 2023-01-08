@@ -1,2 +1,4 @@
 openai~=0.25.0
 pyfiglet~=0.8.post1
+markdown~=3.4.1
+pdfkit~=1.0.0
