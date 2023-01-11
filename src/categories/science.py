@@ -1,5 +1,6 @@
 import openai
 import retrying
+from typing import List, Dict
 
 
 class Science:
@@ -67,7 +68,7 @@ class Science:
             f"The chapter titles should be descriptive and should clearly convey the main focus of each chapter. "
             f"The chapters should be informative and educational, and should encourage the reader to think critically about the topic.")
 
-    def get_structure(self, title: str, chapters: list[str]):
+    def get_structure(self, title: str, chapters: List[str]):
         """
         Gets the structure of the book.
         :param title: The title of the book.
@@ -89,7 +90,7 @@ class Science:
                                  f"In order to prevent any individual section from being too long, try to divide the "
                                  f"content into multiple sections, each with a recommended word count.")
 
-    def get_paragraph(self, title: str, chapters: list[str], paragraphs: list[list[dict[str, str]]],
+    def get_paragraph(self, title: str, chapters: List[str], paragraphs: List[List[Dict[str, str]]],
                       paragraph_index: int, chapter_index: int):
         """
         Gets a paragraph of the book.

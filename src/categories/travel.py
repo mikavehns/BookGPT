@@ -1,5 +1,6 @@
 import openai
 import retrying
+from typing import List, Dict
 
 
 class Travel:
@@ -65,7 +66,7 @@ class Travel:
             f"The chapter titles should be descriptive and should clearly convey the main focus of each chapter. "
             f"The chapters should be informative and inspiring, and should encourage the reader to explore new destinations and cultures.")
 
-    def get_structure(self, title: str, chapters: list[str]):
+    def get_structure(self, title: str, chapters: List[str]):
         """
         Gets the structure of the book.
         :param title: The title of the book.
@@ -85,7 +86,7 @@ class Travel:
             f"In order to prevent any individual paragraph from being too long, "
             f"try to divide the content into multiple paragraphs, each with a recommended word count.")
 
-    def get_paragraph(self, title: str, chapters: list[str], paragraphs: list[list[dict[str, str]]],
+    def get_paragraph(self, title: str, chapters: List[str], paragraphs: List[List[Dict[str, str]]],
                       paragraph_index: int, chapter_index: int):
         """
         Gets a paragraph of the book.

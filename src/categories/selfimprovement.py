@@ -1,5 +1,6 @@
 import openai
 import retrying
+from typing import List, Dict
 
 
 class SelfImprovement:
@@ -85,7 +86,7 @@ class SelfImprovement:
             f"In order to prevent any individual paragraph from being too long, "
             f"try to divide the content into multiple paragraphs, each with a recommended word count.")
 
-    def get_paragraph(self, title: str, chapters: list[str], paragraphs: list[list[dict[str, str]]],
+    def get_paragraph(self, title: str, chapters: List[str], paragraphs: List[List[Dict[str, str]]],
                       paragraph_index: int, chapter_index: int):
         """
         Gets a paragraph of the book.
