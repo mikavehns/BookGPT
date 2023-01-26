@@ -33,7 +33,7 @@ You will then be prompted to enter the following information:
 - Category: The type of book you want to generate. (Science, Biography, etc.)
 
 The program will then generate a Title and Chapter Titles + Content. You will get a detailed structure of the book.
-The generated books will then be saved as `book.md` in the `BookGPT/src`.
+The generated books will then be saved as `book.md` in `BookGPT/src`.
 
 
 ## Examples
