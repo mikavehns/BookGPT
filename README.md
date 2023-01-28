@@ -10,7 +10,7 @@ To install this program, simply follow these steps:
 ```bash
 git clone https://github.com/mikavehns/BookGPT.git
 ```
-2. Navigate to the root directory of the repository using `cd BookGPT/src`
+2. Navigate to the root directory of the repository using `cd BookGPT`
 3. Install the required dependencies by running the following command:
 ```bash
 pip install -r requirements.txt
@@ -33,7 +33,7 @@ You will then be prompted to enter the following information:
 - Category: The type of book you want to generate. (Science, Biography, etc.)
 
 The program will then generate a Title and Chapter Titles + Content. You will get a detailed structure of the book.
-The generated books will then be saved in the `books` folder and will be named after the title of the book.
+The generated books will then be saved as `book.md` in `BookGPT/src`.
 
 
 ## Examples
