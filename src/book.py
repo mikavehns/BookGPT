@@ -52,6 +52,10 @@ class Book:
         # Set the chapter titles
         self.chapter_titles = self.get_chapter_titles()
 
+        # Check if the amount of chapters is equal to the amount of chapter titles and if not, retry
+        if len(self.chapter_titles) != self.chapter_amount:
+            self.__init__(chapter_amount, words_per_chapter, topic, category, language)
+
         # Set the structure of the book
         self.structure = self.get_structure()
 
