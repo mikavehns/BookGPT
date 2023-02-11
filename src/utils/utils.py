@@ -1,4 +1,6 @@
 import os
+import markdown
+from gtts import gTTS
 
 
 def draw_data_structure(data, indent=0):
@@ -8,6 +10,14 @@ def draw_data_structure(data, indent=0):
             draw_data_structure(value, indent + 2)
         else:
             print(' ' * (indent + 2) + str(value))
+
+
+def get_html(markdown_file):
+    return markdown.markdown(markdown_file)
+
+
+def get_mp3(markdown_file, language):
+    return gTTS(markdown_file, lang=language)
 
 
 def get_python_files(path):
@@ -22,4 +32,5 @@ def get_categories():
     special_names = {'selfimprovement': 'SelfImprovement'}
 
     # Return all categories with the first letter capitalized, except for the special names, which are returned, how they are defined in special_names
-    return [category.capitalize() if category not in special_names else special_names[category] for category in categories]
+    return [category.capitalize() if category not in special_names else special_names[category] for category in
+            categories]

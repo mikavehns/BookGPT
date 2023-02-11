@@ -1,7 +1,6 @@
 import openai
 import retrying
 from typing import List, Dict
-list
 
 class Biography:
     """
