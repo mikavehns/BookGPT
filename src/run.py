@@ -110,6 +110,8 @@ def main():
 
     elif saving_option == 2:
         print('Saving to HTML...')
+         with open('book.md', 'w', encoding='utf-8') as f:
+            f.write(book.get_md())
         with open('book.html', 'w', encoding='utf-8') as f:
             f.write(book.get_html())
 
