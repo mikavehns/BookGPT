@@ -2,8 +2,6 @@ import openai
 from tqdm import tqdm
 import prompts
 
-openai.api_key = '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'
-
 
 class Book:
     def __init__(self, **kwargs):
