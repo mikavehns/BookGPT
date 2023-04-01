@@ -1,5 +1,5 @@
 <h1 align="center">BookGPT (Beta)</h1>
-<p align="center">This program uses the GPT-3 API to generate books based on your specified parameters.
+<p align="center">This program uses the ChatGPT API to generate books based on your specified parameters.
 <br><br>
 </p>
 
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 
 ## Prerequisites
-In order to use this program, you must have a [GPT-3 API key](https://beta.openai.com/account/api-keys). The API Key must then be inserted into the `config.json` file.
+In order to use this program, you must have a [ChatGPT API key](https://beta.openai.com/account/api-keys). The API Key must then be inserted into the `config.json` file.
 
 
 ## Usage
@@ -47,10 +47,10 @@ https://user-images.githubusercontent.com/66560242/210459589-751c82d7-e874-4119-
 
 ## Notes
 - The run.py file is just one example on how to use the book generator. You can also implement it into a website, discord bot, desktop app, etc.
-- The program may take some time to run, depending on the specified parameters and the performance of the GPT-3 API. Please be patient while the book is being generated.
+- The program may take some time to run, depending on the specified parameters and the performance of the ChatGPT API. Please be patient while the book is being generated.
 - The program may not always generate the wished amount of words for each chapter. This can happen, if there is not enough data available for the specified topic.
 - Currently, it is only possible to generate Non-Fiction books.
-- Since this is a really early version (v0.6.2), there are many missing features, that will be added by time
+- Since this is a really early version (v0.8.0), there are many missing features, that will be added by time
 
 
 ## License
