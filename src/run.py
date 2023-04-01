@@ -3,7 +3,6 @@ from pyfiglet import Figlet
 from book import Book
 import json
 import openai
-from utils import *
 
 
 # Get the OpenAI API key from the config file
@@ -71,49 +70,71 @@ def main():
 
     # Get the category of the book
     print('What is the category of the book?')
-
-    # Get all files in categories folder
-    categories = get_categories()
-
-    # Get the category
-    category = categories[get_option(categories) - 1]
+    category = input('> ')
 
     # Get the topic of the book
     print('What is the topic of the book?')
     topic = input('> ')
 
-    # Get the topic of the book
-    print('What is the language of the book?')
-    language = input('> ')
+    # What is the tolerance of the book?
+    print('What is the tolerance of the book? (0.8 means that 80% of the words will be written 100%)')
+    tolerance = float(input('> '))
+    if tolerance < 0 or tolerance > 1:
+        tolerance = 0.8
 
-    # Print the book parameters
-    print(f'Generating a book with {chapters} chapters, {words} words per chapter, topic "{topic}" and category "{category}" in {language}.')
+    # Do you want to add any additional parameters?
+    print('Do you want to add any additional parameters?')
+    if get_option(['No', 'Yes']) - 1:
+        print(
+            'Please enter the additional parameters in the following format: "parameter1=value1, parameter2=value2, ..."')
+        additional_parameters = input('> ')
+        additional_parameters = additional_parameters.split(', ')
+        for i in range(len(additional_parameters)):
+            additional_parameters[i] = additional_parameters[i].split('=')
+        additional_parameters = dict(additional_parameters)
+    else:
+        additional_parameters = {}
 
-    # Create a new book
-    book = Book(chapters, words, topic, category, language)
+    # Initialize the Book
+    book = Book(chapters=chapters, words_per_chapter=words, topic=topic, category=category, tolerance=tolerance,
+                **additional_parameters)
 
-    # Print title
-    print(f'Title: {book.title}')
+    # Print the title
+    print(f'Title: {book.get_title()}')
 
-    # Print information
-    print('Generate book..')
+    # Ask if he wants to change the title until he is satisfied
+    while True:
+        print('Do you want to generate a new title?')
+        if get_option(['No', 'Yes']) - 1:
+            print(f'Title: {book.get_title()}')
+        else:
+            break
 
-    # Generate the book
-    book.generate()
+    # Print the structure of the book
+    print('Structure of the book:')
+    structure, _ = book.get_structure()
+    print(structure)
 
-    # Print the saving instruction
-    saving_option = get_option(['Markdown', 'HTML'])
-    if saving_option == 1:
-        print('Saving to markdown...')
-        with open('book.md', 'w', encoding='utf-8') as f:
-            f.write(book.get_md())
+    # Ask if he wants to change the structure until he is satisfied
+    while True:
+        print('Do you want to generate a new structure?')
+        if get_option(['No', 'Yes']) - 1:
+            print('Structure of the book:')
+            structure, _ = book.get_structure()
+            print(structure)
+        else:
+            break
 
-    elif saving_option == 2:
-        print('Saving to HTML...')
-        with open('book.html', 'w', encoding='utf-8') as f:
-            f.write(book.get_html())
+    print('Generating book...')
 
-    print('Done.')
+    # Initialize the book generation
+    book.finish_base()
+
+    content = book.get_content()
+
+    # Save the book
+    book.save_book()
+    print('Book saved as book.md.')
 
 
 # Run the main function

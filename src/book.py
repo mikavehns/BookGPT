@@ -1,301 +1,172 @@
 import openai
-import markdown
-from categories import *
+from tqdm import tqdm
+import prompts
+
+openai.api_key = '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'
 
 
 class Book:
-    """
-    This class represents a book.
+    def __init__(self, **kwargs):
+        # Joining the keyword arguments into a single string
+        self.arguments = '; '.join([f'{key}: {value}' for key, value in kwargs.items() if key != 'tolerance'])
 
-    Attributes:
-        chapter_amount: The amount of chapters the book has.
-        words_per_chapter: The amount of words per chapter.
-        category: The category of the book.
-        topic: The topic of the book.
-        title: The title of the book.
-        chapter_titles: The titles of the chapters.
-        structure: The structure of the book.
-    """
+        # Get 'tolerance' attribute from kwargs
+        self.tolerance = kwargs.get('tolerance', 0.9)
 
-    def __init__(self, chapter_amount: int, words_per_chapter: int, topic: str, category: str, language: str):
-        """
-        This is the constructor for the Book class. It initializes the object with the given parameters.
-        :param chapter_amount: The number of chapters in the book (int).
-        :param words_per_chapter: The number of words per chapter (int).
-        :param topic: The topic of the book (str).
-        :param category: The category of the book (fiction, non-fiction, etc) (str).
-        """
+        # Assign a status variable
+        self.status = 0
 
-        # Define chapter amount
-        self.chapter_amount = chapter_amount
+        # Setting up the base prompt
+        self.base_prompt = [
+            self.get_message('system', prompts.INITIAL_INSTRUCTIONS),
+            self.get_message('user', self.arguments),
+            self.get_message('assistant', 'Ready')
+        ]
 
-        # Define words per chapter
-        self.words_per_chapter = words_per_chapter
+        # Setting up the title prompt
+        self.title_prompt = [
+            self.get_message('system', prompts.TITLE_INSTRUCTIONS),
+            self.get_message('assistant', 'Ready'),
+            self.get_message('user', self.arguments)
+        ]
 
-        # Define topic
-        self.topic = topic
+        # Setting up the structure prompt
+        self.structure_prompt = [
+            self.get_message('system', prompts.STRUCTURE_INSTRUCTIONS),
+            self.get_message('assistant', 'Ready'),
+        ]
 
-        # Define category
-        self.category = category
-
-        # Define language
-        self.language = language
-
-        print('Initializing..')
-
-        # Get book using `get_category` method
-        self.book = self.get_category()
-
-        # Set the title of the book
-        self.title = self.get_title()
-
-        # Set the chapter titles
-        self.chapter_titles = self.get_chapter_titles()
-
-        # Check if the amount of chapters is equal to the amount of chapter titles and if not, retry
-        if len(self.chapter_titles) != self.chapter_amount:
-            self.__init__(chapter_amount, words_per_chapter, topic, category, language)
-
-        # Set the structure of the book
-        self.structure = self.get_structure()
-
-        # Define variable for the packed book
-        self.packed = None
-
-    @staticmethod
-    def __get_edit(input_text, instruction, temperature: float = 0):
-        """
-        This is a private, static method for getting an edited version of the given input text.
-        :param input_text: The text to be edited.
-        :param instruction: The instructions for the edit.
-        :param temperature: The temperature of the edit (defaults to 0).
-        :return: The edited text.
-        """
-
-        # Define the engine to use and returning the edited version
-        return openai.Edit.create(
-            model="text-davinci-edit-001",
-            input=input_text,
-            instruction=instruction,
-            temperature=temperature).choices[0].text
-
-    def get_category(self):
-
-        # Get the category
-        self.category = self.category
-
-        # Return the category class
-        return globals()[self.category](self.chapter_amount, self.words_per_chapter, self.topic, self.language)
+        self.output('Prompts set up. Ready to generate book.')
 
     def get_title(self):
-        """
-        This method returns the title of the book.
-        """
-
-        # Get the title of the book and delete the blank lines
-        title = self.book.get_title().replace('\n', '')
-
-        # Return the title
-        return title
-
-    def get_chapter_titles(self):
-        """
-        This method returns the chapter titles of the book.
-        """
-
-        # Define the chapter titles as the chapter titles of the book
-        chapters = self.book.get_chapters(self.title).split('\n')
-
-        # Remove the blank lines
-        chapters = [chapter for chapter in chapters if chapter != '']
-
-        # Return the chapter titles
-        return chapters
+        self.title = self.get_response(self.title_prompt)
+        return self.title
 
     def get_structure(self):
-        """
-        This method returns the structure of the book.
-        """
+        if not hasattr(self, 'title'):
+            self.output('Title not generated. Please generate title first.')
+            return
+        else:
+            structure_arguments = self.arguments + f'; title: {self.title}'
+            self.structure_prompt.append(self.get_message('user', structure_arguments))
+            self.structure = self.get_response(self.structure_prompt)
+            self.chapters = self.convert_structure(self.structure)
+            self.paragraph_amounts = self.get_paragraph_amounts(self.chapters)
+            self.paragraph_words = self.get_paragraph_words(self.chapters)
+            return self.structure, self.chapters
 
-        # Get the structure of the book and splitting it by the new lines
-        structure = self.book.get_structure(self.title, self.chapter_titles).split('\n')
+    def finish_base(self):
+        if not hasattr(self, 'title'):
+            self.output('Title not generated. Please generate title first.')
+            return
+        elif not hasattr(self, 'structure'):
+            self.output('Structure not generated. Please generate structure first.')
+            return
+        else:
+            self.base_prompt.append(self.get_message('user', '!t'))
+            self.base_prompt.append(self.get_message('assistant', self.title))
 
-        # Remove the blank lines
-        structure = [chapter for chapter in structure if chapter != '']
+            self.base_prompt.append(self.get_message('user', '!s'))
+            self.base_prompt.append(self.get_message('assistant', self.structure))
+            return self.base_prompt
 
-        # Create a list of chapters
-        chapter_list = []
-
-        # Create a list of paragraphs
-        chapter = []
-
-        # Iterate over the lines
-        for line in structure:
-
-            # If the line starts with 'Chapter'
-            if line.lower().startswith('chapter'):
-                # Add the chapter to the list of chapters
-                chapter_list.append(chapter)
-
-                # Create a new list of paragraphs
-                chapter = []
-
-            # Add the line to the list of paragraphs
-            chapter.append(line)
-
-        # Add the last chapter to the list of chapters
-        chapter_list.append(chapter)
-
-        # Remove the first chapter
-        chapter_list = chapter_list[1:]
-
-        # Remove the first paragraph of each chapter
-        chapter_list = [chapter[1:] for chapter in chapter_list]
-
-        # Create a new list of chapters
-        chapter_list_new = []
-
-        # Iterate over the chapters
-        for chapter in chapter_list:
-
-            # Create a list of paragraphs
-            paragraph_list = []
-
-            # Iterate over the paragraphs
-            for paragraph in chapter:
-
-                # Get the title of the paragraph
-                title = paragraph.split('---')[0]
-
-                # Get the word count of the paragraph
-                word_count = paragraph.split('---')[1]
-
-                # If the word count contains the word 'words'
-                if 'words' in word_count.lower():
-                    # Remove the word 'words'
-                    word_count = word_count.split(' ')[0]
-
-                # Add the paragraph to the list of paragraphs
-                paragraph_list.append({'title': title, 'word_count': word_count})
-
-            # Add the list of paragraphs to the list of chapters
-            chapter_list_new.append(paragraph_list)
-
-        # Return the list of chapters
-        return chapter_list_new
-
-    def get_paragraph(self, chapter_index, paragraph_index):
-        """
-        This method returns the paragraph at the given index in the given chapter.
-        :param paragraph_index: The index of the paragraph.
-        :param chapter_index: The index of the chapter.
-        :return: The paragraph.
-        """
-
-        # Get the paragraph at the given index in the given chapter
-        return self.book.get_paragraph(self.title, self.chapter_titles, self.structure, paragraph_index, chapter_index)
-
-    def get_chapter(self, chapter_index):
-        """
-        This method returns the chapter at the given index.
-        :param chapter_index: The index of the chapter.
-        :return: The chapter.
-        """
-
-        # Define empty list for the paragraphs
-        chapter = []
-
-        # Iterate over the paragraphs in the chapter
-        for i in range(len(self.structure[chapter_index])):
-
-            # Add the paragraph to the list of paragraphs
-            chapter.append(self.get_paragraph(chapter_index, i))
-
-        # Return the chapter
-        return chapter
+    def calculate_max_status(self):
+        if not hasattr(self, 'chapters'):
+            self.output('Structure not generated. Please generate structure first.')
+            return
+        else:
+            self.max_status = sum(self.get_paragraph_amounts(self.chapters))
+            return self.max_status
 
     def get_content(self):
-        """
-        This method returns the book.
-        :return: The book.
-        """
+        chapters = []
+        for i in tqdm(range(len(self.chapters))):
+            prompt = self.base_prompt.copy()
+            chapter = self.get_chapter(i, prompt)
+            chapters.append(chapter)
+        self.content = chapters
+        return self.content
 
-        # Define empty list for the content of the chapters
-        content = []
+    def save_book(self):
+        # Save the book in md format
+        with open(f'book.md', 'w') as file:
+            file.write(f'# {self.title}\n\n')
+            for chapter in self.content:
+                file.write(f'## {self.chapters[self.content.index(chapter)]["title"]}\n\n')
+                for paragraph in chapter:
+                    file.write(
+                        f'### {self.chapters[self.content.index(chapter)]["paragraphs"][chapter.index(paragraph)]["title"]}\n\n')
+                    file.write(paragraph + '\n\n')
+                file.write('\n\n')
 
-        # Iterate over the chapters
-        for i in range(len(self.structure)):
+    def get_chapter(self, chapter_index, prompt):
+        if len(self.base_prompt) == 3:
+            self.finish_base()
 
-            # Add the content of the chapter to the list
-            content.append(self.get_chapter(i))
+        paragraphs = []
+        for i in range(self.paragraph_amounts[chapter_index]):
+            paragraph = self.get_paragraph(prompt.copy(), chapter_index, i)
+            prompt.append(self.get_message('user', f'!w {chapter_index + 1} {i + 1}'))
+            prompt.append(self.get_message('assistant', paragraph))
+            self.status += 1
+            paragraphs.append(paragraph)
+        return paragraphs
 
-        # Return the content
-        return content
+    def get_paragraph(self, prompt, chapter_index, paragraph_index):
+        prompt.append(self.get_message('user', f'!w {chapter_index + 1} {paragraph_index + 1}'))
+        paragraph = self.get_response(prompt)
+        prompt.append(self.get_message('assistant', paragraph))
 
-    def generate(self):
-        """
-        This method generates the book.
-        """
+        while len(paragraph.split(' ')) < int(self.paragraph_words[chapter_index][paragraph_index] * self.tolerance):
+            prompt.append(self.get_message('system', '!c'))
+            response = self.get_response(prompt)
+            paragraph += response
+            prompt.append(self.get_message('assistant', response))
 
-        # Get content
-        content = self.get_content()
+        return paragraph
 
-        # Pack book
-        book = {'title': self.title, 'chapters': content, 'chapter_titles': self.chapter_titles, 'structure': self.structure}
+    @staticmethod
+    def get_message(role, content):
+        return {"role": role, "content": content}
 
-        # Return the book
-        self.packed = book
+    @staticmethod
+    def convert_structure(structure):
+        chapters = structure.split("Chapter")
+        chapters = [x for x in chapters if x != '']
+        chapter_information = []
 
-    def get_md(self):
-        """
-        This method returns the book in Markdown format.
-        """
+        for chapter in chapters:
+            for line in chapter.split("\n"):
+                if 'paragraphs' in line.lower():
+                    chapter_information.append({'title': line.split('): ')[1], 'paragraphs': []})
+                elif 'paragraph' in line.lower():
+                    chapter_information[-1]['paragraphs'].append(
+                        {'title': line.split('): ')[1], 'words': line.split('(')[1].split(')')[0].split(' ')[0]})
+            chapter_information[-1]['paragraph_amount'] = len(chapter_information[-1]['paragraphs'])
 
-        # Check if variable packed is exists
-        if self.packed is None:
-            print('Book not generated yet. Generating book...')
-            self.generate()
+        return chapter_information
 
-        # Get the book
-        book = self.packed
+    @staticmethod
+    def get_paragraph_amounts(structure):
+        amounts = []
+        for chapter in structure:
+            amounts.append(chapter['paragraph_amount'])
+        return amounts
 
-        # Define the variables
-        content = book['chapters']
+    @staticmethod
+    def get_paragraph_words(structure):
+        words = []
+        for chapter in structure:
+            words.append([int(x['words']) for x in chapter['paragraphs']])
+        return words
 
-        # Build the book
+    @staticmethod
+    def get_response(prompt):
+        return openai.ChatCompletion.create(
+            model="gpt-3.5-turbo-0301",
+            messages=prompt
+        )["choices"][0]["message"]["content"]
 
-        # Add the title of the book
-        book = '# ' + self.title + '\n\n\n'
-
-        # Add the chapter titles and content
-        for i in range(len(content)):
-
-            # Add the chapter title in md format
-            book += '\n\n## ' + self.chapter_titles[i] + '\n'
-
-            # Iterate through the paragraphs
-            for paragraph in content[i]:
-
-                # Check if paragraph ends with a blank line
-                if paragraph.endswith('\n'):
-
-                    # Add the paragraph
-                    book += paragraph
-                else:
-
-                    # Add the paragraph with a blank line
-                    book += paragraph + '\n'
-
-        # Return the combined book.
-        return book
-
-    def get_html(self):
-        """
-        This method returns the book in HTML format.
-        """
-
-        # Getting Markdown element
-        md = markdown.markdown(self.get_md())
-
-        # Return the HTML
-        return md
+    @staticmethod
+    def output(message):
+        print(message)
