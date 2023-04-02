@@ -66,7 +66,11 @@ def main():
 
     # Get the number of words per chapter
     print('How many words should each chapter have?')
+    # Check if it is below 1200
     words = int(input('> '))
+    if words <= 1200:
+        words = 1200
+        print('The number of words per chapter has been set to 1200. (The max number of words per chapter)')
 
     # Get the category of the book
     print('What is the category of the book?')
