@@ -80,7 +80,7 @@ class Book:
         chapters = []
         for i in tqdm(range(len(self.chapters))):
             prompt = self.base_prompt.copy()
-            chapter = self.get_chapter(i, prompt)
+            chapter = self.get_chapter(i, prompt.copy())
             chapters.append(chapter)
         self.content = chapters
         return self.content
