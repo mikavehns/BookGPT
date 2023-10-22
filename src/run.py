@@ -1,8 +1,10 @@
 # Imports
 from pyfiglet import Figlet
 from book import Book
-import json
 import openai
+import os
+import streamlit as st
+import json
 
 
 # Get the OpenAI API key from the config file
@@ -11,7 +13,6 @@ def get_api_key():
     with open('config.json', 'r') as f:
         # Return the OpenAI key
         return json.load(f)['OpenAI_key']
-
 
 # Draw the given text in a figlet
 def draw(text):
@@ -52,6 +53,7 @@ def get_option(options):
 def main():
     # Set the OpenAI API key
     openai.api_key = get_api_key()
+    #openai.api_key = os.getenv("OPENAI_KEY")
 
     # Draw the title
     draw('BookGPT')
@@ -63,14 +65,16 @@ def main():
     # Get the number of chapters
     print('How many chapters should the book have?')
     chapters = int(input('> '))
+    if chapters <= 1:
+        words = 1
 
     # Get the number of words per chapter
     print('How many words should each chapter have?')
     # Check if it is below 1200
     words = int(input('> '))
-    if words <= 1200:
-        words = 1200
-        print('The number of words per chapter has been set to 1200. (The max number of words per chapter)')
+    if words >= 2600:
+        words = 2600
+        print('The number of words per chapter has been set to 2600. (The max number of words per chapter)')
 
     # Get the category of the book
     print('What is the category of the book?')
@@ -83,7 +87,7 @@ def main():
     # What is the tolerance of the book?
     print('What is the tolerance of the book? (0.8 means that 80% of the words will be written 100%)')
     tolerance = float(input('> '))
-    if tolerance < 0 or tolerance > 1:
+    if tolerance <= 0 or tolerance >= 0.9:
         tolerance = 0.8
 
     # Do you want to add any additional parameters?
@@ -116,15 +120,15 @@ def main():
 
     # Print the structure of the book
     print('Structure of the book:')
-    structure, _ = book.get_structure()
-    print(structure)
+    structure = book.get_structure()
+    print(book)
 
     # Ask if he wants to change the structure until he is satisfied
     while True:
         print('Do you want to generate a new structure?')
         if get_option(['No', 'Yes']) - 1:
             print('Structure of the book:')
-            structure, _ = book.get_structure()
+            structure = book.get_structure()
             print(structure)
         else:
             break
@@ -138,7 +142,7 @@ def main():
 
     # Save the book
     book.save_book()
-    print('Book saved as book.md.')
+    print('Book saved.')
 
 
 # Run the main function
