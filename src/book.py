@@ -1,9 +1,23 @@
 import openai
 from tqdm import tqdm
 import prompts
-
+import random
+from datetime import datetime, timezone, timedelta
 
 class Book:
+    def __str__(self):
+        book_structure = "Structure of the book:\n"
+        for chapter_index, chapter_info in enumerate(self.chapters, start=1):
+            chapter_title = chapter_info['title']
+            chapter_paragraphs = chapter_info['paragraphs']
+            book_structure += f"Chapter {chapter_index} ({len(chapter_paragraphs)} paragraphs): {chapter_title}\n"
+            for paragraph_index, paragraph_info in enumerate(chapter_paragraphs, start=1):
+                paragraph_title = paragraph_info['title']
+                paragraph_words = paragraph_info['words']
+                book_structure += f"\tParagraph {paragraph_index} ({paragraph_words} words): {paragraph_title}\n"
+
+        return book_structure
+      
     def __init__(self, **kwargs):
         # Joining the keyword arguments into a single string
         self.arguments = '; '.join([f'{key}: {value}' for key, value in kwargs.items() if key != 'tolerance'])
@@ -49,9 +63,14 @@ class Book:
             self.structure_prompt.append(self.get_message('user', structure_arguments))
             self.structure = self.get_response(self.structure_prompt)
             self.chapters = self.convert_structure(self.structure)
-            self.paragraph_amounts = self.get_paragraph_amounts(self.chapters)
-            self.paragraph_words = self.get_paragraph_words(self.chapters)
-            return self.structure, self.chapters
+
+            # Ensure self.chapters contains the actual chapter information before assigning paragraph amounts and words.
+        if isinstance(self.chapters, list):
+            self.paragraph_amounts = self.get_paragraph_amounts(self.chapters)  # updated line
+            self.paragraph_words = self.get_paragraph_words(self.chapters)  # updated line
+            return str(self.structure), self.chapters
+        else:
+            self.output('Error in converting the book structure.')
 
     def finish_base(self):
         if not hasattr(self, 'title'):
@@ -87,18 +106,26 @@ class Book:
 
     def save_book(self):
         # Save the book in md format
-        with open(f'book.md', 'w') as file:
+        # Corrected saving the book with the specified time
+        desired_time = datetime.now(timezone(timedelta(hours=-5)))  # EST timezone
+        # Use the desired time as a seed for the random number generator
+        random.seed(desired_time)
+        # Generate a random 4-digit number
+        random_number = random.randint(1000009, 9999999)
+        # Ensure it's 4 digits long
+        random_number = str(random_number).zfill(random.randint(7, 10))
+        with open(f'book{random_number}.md', 'w') as file:
             file.write(f'# {self.title}\n\n')
             for chapter in self.content:
                 file.write(f'## {self.chapters[self.content.index(chapter)]["title"]}\n\n')
                 for paragraph in chapter:
                     file.write(
-                        f'### {self.chapters[self.content.index(chapter)]["paragraphs"][chapter.index(paragraph)]["title"]}\n\n')
+                        f'### {self.chapters[self.content.index(chapter)]["paragraphs"][chapter.index(paragraph)]["title"]}\n\n'
+                              )
                     file.write(paragraph + '\n\n')
-                file.write('\n\n')
 
     def get_chapter(self, chapter_index, prompt):
-        if len(self.base_prompt) == 3:
+        if len(self.base_prompt) <= 9:
             self.finish_base()
 
         paragraphs = []
@@ -136,19 +163,34 @@ class Book:
         for chapter in chapters:
             for line in chapter.split("\n"):
                 if 'paragraphs' in line.lower():
-                    chapter_information.append({'title': line.split('): ')[1], 'paragraphs': []})
-                elif 'paragraph' in line.lower():
+                    chapter_information.append(
+                      {'title': line.split('): ')[1], 'paragraphs': []}
+                                              )
+                if 'paragraph' in line.lower():
                     chapter_information[-1]['paragraphs'].append(
-                        {'title': line.split('): ')[1], 'words': line.split('(')[1].split(')')[0].split(' ')[0]})
-            chapter_information[-1]['paragraph_amount'] = len(chapter_information[-1]['paragraphs'])
-
+                    {'title': line.split('): ')[1], 'words': line.split(
+                      '(')[1].split(')'
+                                                                       )[0].split(
+                      ' '
+                                                                                 )[0]}
+                                                                )
+                elif chapter_information == []:
+                  ## I can't figure out the code for this
+                  chapter_information[0]['paragraphs'].append(
+                    {'title': line.split('): ')[1], 'words': line.split(
+                      '(')[1].split(')'
+                                                                       )[0].split(
+                      ' '
+                                                                                 )[0]}
+                                                                )
+                  
         return chapter_information
 
     @staticmethod
     def get_paragraph_amounts(structure):
         amounts = []
         for chapter in structure:
-            amounts.append(chapter['paragraph_amount'])
+            amounts.append(len(chapter['paragraphs']))
         return amounts
 
     @staticmethod
@@ -161,7 +203,7 @@ class Book:
     @staticmethod
     def get_response(prompt):
         return openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0301",
+            model="gpt-3.5-turbo-16k-0613",
             messages=prompt
         )["choices"][0]["message"]["content"]
 
