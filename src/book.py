@@ -1,6 +1,7 @@
 import openai
 from tqdm import tqdm
 import prompts
+import time
 
 
 class Book:
@@ -159,11 +160,26 @@ class Book:
         return words
 
     @staticmethod
-    def get_response(prompt):
-        return openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0301",
-            messages=prompt
-        )["choices"][0]["message"]["content"]
+    def get_response(prompt, max_retries=5):
+        retries = 0
+        while retries < max_retries:
+            try:
+                response = openai.ChatCompletion.create(
+                    # model="gpt-3.5-turbo-16k",
+                    model="gpt-3.5-turbo",
+                    messages=prompt
+                )["choices"][0]["message"]["content"]
+                # append prompt and response to log file
+                with open("log.txt", "a") as f:
+                    f.write(f"Prompt: {prompt}\nResponse: {response}\n\n")                
+                return response
+            except Exception as e:
+                retries += 1
+                print(f"An error occurred: {e}. Retrying ({retries}/{max_retries})...")
+                time.sleep(1)  # wait 1 second before retrying
+
+        # Raise an exception if all retries fail
+        raise Exception(f"Failed to get a response after {max_retries} retries.")
 
     @staticmethod
     def output(message):
