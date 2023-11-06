@@ -18,13 +18,13 @@ pip install -r requirements.txt
 
 
 ## Prerequisites
-In order to use this program, you must have a [ChatGPT API key](https://beta.openai.com/account/api-keys). The API Key must then be inserted into the `config.json` file.
+In order to use this program, you must have a [ChatGPT API key](https://beta.openai.com/account/api-keys). The API Key must then be inserted into the `src/config.json` file.
 
 
 ## Usage
 To use this program, simply run the following command in your terminal:
 ```bash
-python run.py
+python src/run.py
 ```
 You will then be prompted to enter the following information:
 - Chapter Amount: The amount of chapters you want the book to have.
